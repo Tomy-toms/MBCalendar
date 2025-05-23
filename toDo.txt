@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 A FAIRE :
@@ -11,4 +12,19 @@ OK  - Gestion droits utilisateurs
 
 BUGS :
 
+=======
+
+
+A FAIRE :
+
+OK  - Migration des données vers l'API
+OK  - Migration des données vers base de données
+OK  - Gestion droits utilisateurs
+    - Appli mobile
+    - liaison données appli mobile et base de données distante
+
+
+BUGS :
+
+>>>>>>> fc43a738188cdce725539ef8b5fbec58e7d6320d
     - Affichage semaine 20... Modifier pour afficher semaine actuelle au démarrage
