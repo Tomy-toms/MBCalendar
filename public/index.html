@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificateur de Livraisons et Poses</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <header> 
+        <div class="header-tab active" id="tab-livraisons">Planning Livreurs</div>
+        <div class="header-tab" id="tab-poseurs">Planning Poseurs</div>
+        
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 20px;">
+            <div id="user-info" class="user-info-display"></div>
+            <div class="header-tab logout-tab" id="logout-btn">Déconnexion</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="week-selector">
+            <div class="week-number">
+                <button id="prev-week">&lt;</button>
+                <span>SEMAINE</span>
+                <input type="number" id="week-input" value="20" min="1" max="53" style="width: 60px; text-align: center; padding: 5px;">
+                <button id="next-week">&gt;</button>
+            </div>
+        </div>
+        <div class="button-container">
+            <button class="btn btn-primary menu" id="add-task">Ajouter tâche</button>
+            <button class="btn btn-success menu" id="mark-completed">Marquer terminée</button>
+            <button class="btn btn-danger menu" id="delete-task">Supprimer tâche</button>
+            <button class="btn btn-warning menu" id="export-planning">Exporter planning</button>
+            <button class="btn btn-secondary menu" id="settings">Paramètres</button>
+            <div id="livreur-selector" class="livreur-selector" style="display: none;">
+                <label for="selected-livreur" class="menu">Sélectionner un livreur:</label>
+                <select id="selected-livreur" class="form-control">
+                    <option value="all">Ajouter un livreur</option>
+                </select>
+            </div>
+        </div>
+        <div id="calendar-container">
+            <table id="calendar">
+                <thead>
+                    <tr>
+                        <th id="main-column-header" style="width: 150px;">ARTISAN</th>
+                        <th>LUNDI<br><span class="date-display">5</span></th>
+                        <th>MARDI<br><span class="date-display">6</span></th>
+                        <th>MERCREDI<br><span class="date-display">7</span></th>
+                        <th>JEUDI<br><span class="date-display">8</span></th>
+                        <th>VENDREDI<br><span class="date-display">9</span></th>
+                    </tr>
+                </thead>
+                <tbody id="calendar-body">
+                    <!-- Données dynamiques ici -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Modal d'ajout de tâche -->
+    <div class="modal" id="task-modal">
+        <div class="modal-content fade-in task-window">
+            <div class="modal-header">
+                <h2>Ajouter une tâche</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="task-form">
+                    <div class="form-group">
+                        <label for="task-type">Type de tâche</label>
+                        <select class="form-control" id="task-type" required>
+                            <option value="livraison">Livraison</option>
+                            <option value="pose">Pose</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-artisan">Artisan</label>
+                        <select class="form-control" id="task-artisan" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-day">Jour</label>
+                        <select class="form-control" id="task-day" required>
+                            <option value="1">Lundi</option>
+                            <option value="2">Mardi</option>
+                            <option value="3">Mercredi</option>
+                            <option value="4">Jeudi</option>
+                            <option value="5">Vendredi</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-chantier">Chantier</label>
+                        <select class="form-control" id="task-chantier" required>
+                            <option value="">Sélectionner un chantier</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-description">Description</label>
+                        <input type="text" class="form-control" id="task-description" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-notes">Notes</label>
+                        <textarea class="form-control" id="task-notes"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Annuler</button>
+                <button class="btn btn-primary" id="save-task">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de paramètres -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content fade-in">
+            <div class="modal-header">
+                <h2>Paramètres</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="settings-form">
+                    <div class="settings-tabs">
+                        <button type="button" class="settings-tab active" data-tab="poseurs">Poseurs</button>
+                        <button type="button" class="settings-tab" data-tab="livreurs">Livreurs</button>
+                        <button type="button" class="settings-tab" data-tab="chantiers">Chantiers</button>
+                        <button type="button" class="settings-tab" data-tab="users">Utilisateurs</button>
+                        <button type="button" class="settings-tab" data-tab="other">Autres paramètres</button>
+                    </div>
+                    <div id="poseurs-settings" class="settings-panel active">
+                        <h3>Gestion des poseurs</h3>
+                        <div class="form-group">
+                            <label for="poseur-list">Poseurs actuels</label>
+                            <select class="form-control" id="poseur-list" size="5" style="margin-bottom: 10px;">
+                                <!-- Liste dynamique des poseurs -->
+                            </select>
+                            <button type="button" class="btn btn-danger" id="remove-poseur">Supprimer le poseur</button>
+                        </div>
+                        <hr style="margin: 20px 0;">
+                        <h3>Ajouter un nouveau poseur</h3>
+                        <div class="form-group">
+                            <label for="new-poseur-name">Nom</label>
+                            <input type="text" class="form-control" id="new-poseur-name" placeholder="Nom du poseur">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-poseur-phone">Téléphone</label>
+                            <input type="text" class="form-control" id="new-poseur-phone" placeholder="Numéro de téléphone">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="add-poseur">Ajouter le poseur</button>
+                    </div>
+
+                    <div id="livreurs-settings" class="settings-panel">
+                        <h3>Gestion des livreurs</h3>
+                        <div class="form-group">
+                            <label for="livreur-list">Livreurs actuels</label>
+                            <select class="form-control" id="livreur-list" size="5" style="margin-bottom: 10px;">
+                                <!-- Liste dynamique des livreurs -->
+                            </select>
+                            <button type="button" class="btn btn-danger" id="remove-livreur">Supprimer le livreur</button>
+                        </div>
+                        <hr style="margin: 20px 0;">
+                        <h3>Ajouter un nouveau livreur</h3>
+                        <div class="form-group">
+                            <label for="new-livreur-name">Nom</label>
+                            <input type="text" class="form-control" id="new-livreur-name" placeholder="Nom du livreur">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-livreur-phone">Téléphone</label>
+                            <input type="text" class="form-control" id="new-livreur-phone" placeholder="Numéro de téléphone">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="add-livreur">Ajouter le livreur</button>
+                    </div>
+
+                    <div id="chantiers-settings" class="settings-panel">
+                        <h3>Gestion des chantiers</h3>
+                        <div class="form-group">
+                            <label for="chantier-list">Chantiers existants</label>
+                            <select class="form-control" id="chantier-list" size="5" style="margin-bottom: 10px;"></select>
+                            <button type="button" class="btn btn-danger" id="remove-chantier">Supprimer le chantier</button>
+                        </div>
+                        <hr style="margin: 20px 0;">
+                        <h3>Ajouter un nouveau chantier</h3>
+                        <div class="form-group">
+                            <label for="new-chantier-name">Nom</label>
+                            <input type="text" class="form-control" id="new-chantier-name" placeholder="Nom du chantier">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-chantier-address">Adresse</label>
+                            <input type="text" class="form-control" id="new-chantier-address" placeholder="Adresse du chantier">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="add-chantier">Ajouter le chantier</button>
+                    </div>
+
+                    <!-- Panneau de gestion des utilisateurs -->
+                    <div id="users-settings" class="settings-panel">
+                        <h3>Gestion des utilisateurs</h3>
+                        <div class="form-group">
+                            <label for="user-list">Utilisateurs actuels</label>
+                            <select class="form-control" id="user-list" size="5" style="margin-bottom: 10px;">
+                                <!-- Liste dynamique des utilisateurs -->
+                            </select>
+                            <div class="user-action-buttons">
+                                <button type="button" class="btn btn-warning" id="edit-user">Modifier</button>
+                                <button type="button" class="btn btn-danger" id="remove-user">Supprimer</button>
+                            </div>
+                        </div>
+                        <hr style="margin: 20px 0;">
+                        <h3>Ajouter un nouvel utilisateur</h3>
+                        <div class="form-group">
+                            <label for="new-user-lastname">Nom</label>
+                            <input type="text" class="form-control" id="new-user-lastname" placeholder="Nom de famille">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-user-firstname">Prénom</label>
+                            <input type="text" class="form-control" id="new-user-firstname" placeholder="Prénom">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-user-login">Identifiant</label>
+                            <input type="text" class="form-control" id="new-user-login" placeholder="Identifiant de connexion">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-user-password">Mot de passe temporaire</label>
+                            <div class="password-field">
+                                <input type="password" class="form-control" id="new-user-password" placeholder="Mot de passe temporaire">
+                                <button type="button" class="btn btn-secondary" id="generate-password">Générer</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-user-role">Rôle</label>
+                            <select class="form-control" id="new-user-role">
+                                <option value="admin">Admin</option>
+                                <option value="secretaire">Secrétaire</option>
+                                <option value="conducteur">Conducteur</option>
+                                <option value="etude">Étude</option>
+                                <option value="livreur">Livreur</option>
+                                <option value="poseur">Poseur</option>
+                                <option value="fabriquant">Fabriquant</option>
+                                <option value="magasinier">Magasinier</option>
+                                <option value="visiteur">Visiteur</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="add-user">Ajouter l'utilisateur</button>
+                    </div>
+                    
+                    <div id="other-settings" class="settings-panel">
+                        <h3>Sauvegarde automatique</h3>
+                        <div class="form-group">
+                            <label for="auto-save-interval">Intervalle de sauvegarde automatique</label>
+                            <select class="form-control" id="auto-save-interval">
+                                <option value="0">Désactivée</option>
+                                <option value="30">30 secondes</option>
+                                <option value="60">1 minute</option>
+                                <option value="300">5 minutes</option>
+                                <option value="600">10 minutes</option>
+                                <option value="1800">30 minutes</option>
+                            </select>
+                        </div>
+                        <hr style="margin: 20px 0;">
+                        <h3>Sauvegarde et restauration</h3>
+                        <div class="form-group form-group-data">
+                            <button type="button" class="btn btn-warning" id="export-data">Exporter les données</button>
+                            <button type="button" class="btn btn-primary" id="import-data" style="margin-left: 10px;">Importer des données</button>
+                            <input type="file" id="import-file" style="display: none;">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification"></div>
+    <script src="/script/script.js"></script>
+</body>
+</html>
+                
