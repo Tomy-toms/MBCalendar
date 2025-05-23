@@ -1,0 +1,77 @@
+{
+  "tasks": [
+    {
+      "id": 1747661277355,
+      "type": "livraison",
+      "artisanId": 1747659575649,
+      "day": 3,
+      "week": 21,
+      "year": 2025,
+      "description": "Description 1",
+      "chantierId": 1747660962660,
+      "notes": "Palette",
+      "completed": false
+    },
+    {
+      "id": 1747663768815,
+      "type": "pose",
+      "artisanId": 1747662716733,
+      "day": 3,
+      "week": 21,
+      "year": 2025,
+      "description": "PORTES PALIERES",
+      "chantierId": 1747660962660,
+      "notes": "Dispatch nécessaire",
+      "completed": false
+    },
+    {
+      "id": 1747663820678,
+      "type": "livraison",
+      "artisanId": 1747659575649,
+      "day": 2,
+      "week": 21,
+      "year": 2025,
+      "description": "PALETTE COUVRE JOINTS",
+      "chantierId": 1747660962660,
+      "notes": "80 ensembles de couvre-joints",
+      "completed": false
+    }
+  ],
+  "livreurs": [
+    {
+      "id": 1747659575649,
+      "name": "JEROME",
+      "phone": "06.89.88.76.78"
+    },
+    {
+      "id": 1747661185479,
+      "name": "TOTO",
+      "phone": "06.52.36.16.22"
+    }
+  ],
+  "poseurs": [
+    {
+      "id": 1747662681355,
+      "name": "Thomas BARTHELEMY",
+      "phone": "0659268430"
+    },
+    {
+      "id": 1747662716733,
+      "name": "TITI GROSMINET",
+      "phone": "06.54.58.44.33"
+    },
+    {
+      "id": 1747662737287,
+      "name": "LAID DIT GAGA",
+      "phone": "06.89.44.55.66"
+    }
+  ],
+  "chantiers": [
+    {
+      "id": 1747660962660,
+      "name": "ISCHIA",
+      "address": "28 Rue du Port, 34000 Montpellier"
+    }
+  ],
+  "users": []
+}

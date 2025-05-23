@@ -1,0 +1,14 @@
+
+
+A FAIRE :
+
+OK  - Migration des données vers l'API
+OK  - Migration des données vers base de données
+OK  - Gestion droits utilisateurs
+    - Appli mobile
+    - liaison données appli mobile et base de données distante
+
+
+BUGS :
+
+    - Affichage semaine 20... Modifier pour afficher semaine actuelle au démarrage
